@@ -428,6 +428,11 @@ services:
         - "${HTTPS_BIND:-}:${HTTPS_PORT:-8443}:${HTTPS_PORT:-8443}"
         - "${HTTP_BIND:-}:${HTTP_PORT:-8080}:${HTTP_PORT:-8080}"
       restart: always
+      networks:
+        mailcow-network:
+          aliases:
+            - nginx
+        dokploy-network: {}
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.mailcow.rule=Host(`${MAILCOW_HOSTNAME}`)"
@@ -436,12 +441,6 @@ services:
         - "traefik.http.routers.mailcow.tls=true"
         - "traefik.http.routers.mailcow.tls.certresolver=default"
         - "traefik.docker.network=dokploy-network"
-      networks:
-        mailcow-network:
-          aliases:
-            - nginx
-        dokploy-network:
-          external: true
 
     acme-mailcow:
       depends_on:
