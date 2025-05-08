@@ -428,10 +428,21 @@ services:
         - "${HTTPS_BIND:-}:${HTTPS_PORT:-8443}:${HTTPS_PORT:-8443}"
         - "${HTTP_BIND:-}:${HTTP_PORT:-8080}:${HTTP_PORT:-8080}"
       restart: always
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mailcow.rule=Host(`${MAILCOW_HOSTNAME}`)"
+        - "traefik.http.routers.mailcow.entrypoints=web,websecure"
+        - "traefik.http.services.mailcow.loadbalancer.server.port=${HTTP_PORT:-8080}"
+        - "traefik.http.routers.mailcow.tls=true"
+        - "traefik.http.routers.mailcow.tls.certresolver=default"
+        - "traefik.docker.network=dokploy-network"
       networks:
         mailcow-network:
           aliases:
             - nginx
+        default:
+          external: true
+          name: dokploy-network
 
     acme-mailcow:
       depends_on:
